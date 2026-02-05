@@ -48,11 +48,37 @@ export default function ConverterInterface() {
             const cleanName = file?.name.replace(/\.[^/.]+$/, "") || 'quiz';
             const zipBlob = await createCanvasPackage(xml, `${cleanName}.xml`);
 
+            const suggestedName = `${cleanName}_qti.zip`;
+
             // 4. Download
+            // Try File System Access API first
+            try {
+                // @ts-ignore
+                if (window.showSaveFilePicker) {
+                    // @ts-ignore
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: suggestedName,
+                        types: [{
+                            description: 'QTI ZIP Package',
+                            accept: { 'application/zip': ['.zip'] },
+                        }],
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(zipBlob);
+                    await writable.close();
+                    return; // Done
+                }
+            } catch (err: any) {
+                // If user aborted, stop. If other error, fallback to legacy download.
+                if (err.name === 'AbortError') return;
+                console.error('File picker not supported or failed, using fallback:', err);
+            }
+
+            // Fallback: Legacy Download (Archive)
             const url = URL.createObjectURL(zipBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${cleanName}_qti.zip`;
+            a.download = suggestedName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -73,10 +99,10 @@ export default function ConverterInterface() {
             <div className="mb-6">
                 <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
                     <PackageCheck className="w-6 h-6 text-primary" />
-                    QTI 1.2 Converter
+                    Excel to QTI Converter
                 </h2>
                 <p className="text-slate-500 mt-2">
-                    ខបករណ៏សម្រាប់បំប្លែងហ្វាល់សំណួរនៅ Excel/CSV ទៅជាហ្វាល់ QTI ZIP សម្រាប់ផ្ទេរសំណួរទៅប្រព័ន្ធសិក្សា Canvas
+                    ឧបករណ៍សម្រាប់បំប្លែងហ្វាល់ Excel/XLSX ទៅជាហ្វាល់ QTI ZIP សម្រាប់បញ្ចូលសំណួរទៅក្នុងប្រព័ន្ធគ្រប់គ្រងការសិក្សា Canvas
                 </p>
             </div>
 
@@ -97,10 +123,10 @@ export default function ConverterInterface() {
                             <FileSpreadsheet className="w-8 h-8 text-primary" />
                         </div>
                         <div className="text-slate-600 font-medium">
-                            ចុចដើម្បីធ្វើការបង្ហោះ ហ្វាល់ Excel ឬ​ CSV
+                            ចុចទីនេះដើម្បីជ្រើសរើសហ្វាល់ Excel ឬ​ CSV
                         </div>
                         <div className="text-sm text-slate-400">
-                            ត្រូវប្រាកដថាហ្វាល់ CSV របស់អ្នកមើលឃើញជាភាសាខ្មែរ មិនមែនភាសា Binary
+                            សូមប្រាកដថាហ្វាល់របស់អ្នកមានក្បាលតារាងត្រឹមត្រូវ (Type, Points, Question...)
                         </div>
                     </label>
                 </div>
@@ -129,7 +155,7 @@ export default function ConverterInterface() {
                             <div>
                                 <p className="text-slate-800 font-semibold">{file.name}</p>
                                 <p className="text-xs text-slate-500">
-                                    {questions.length} Questions Found ({mcCount} MC, {tfCount} TF)
+                                    រកឃើញ {questions.length} សំណួរ ({mcCount} MC, {tfCount} TF)
                                 </p>
                             </div>
                         </div>
@@ -140,7 +166,7 @@ export default function ConverterInterface() {
                             }}
                             className="text-sm text-red-500 hover:text-red-600 underline"
                         >
-                            Change File
+                            លុបចោល
                         </button>
                     </div>
 
@@ -167,40 +193,19 @@ export default function ConverterInterface() {
                             <button
                                 onClick={handleGenerate}
                                 disabled={generating}
-                                className="flex-1 bg-primary hover:bg-sky-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                                className="w-full bg-primary hover:bg-sky-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                             >
                                 {generating ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        Generating ZIP...
+                                        កំពុងបង្កើត...
                                     </>
                                 ) : (
                                     <>
                                         <Download className="w-5 h-5" />
-                                        Download QTI ZIP
+                                        ទាញយក QTI ZIP
                                     </>
                                 )}
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    if (!questions.length) return;
-                                    const xmlContent = generateQTIXML(questions);
-                                    const blob = new Blob([xmlContent], { type: 'text/xml;charset=utf-8' });
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = `${file?.name.replace(/\.[^/.]+$/, "")}_qti.xml`;
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                    URL.revokeObjectURL(url);
-                                }}
-                                disabled={generating}
-                                className="flex-1 bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-200 font-semibold py-4 px-6 rounded-xl transition-all hover:border-primary/50 flex items-center justify-center gap-3"
-                            >
-                                <FileCode className="w-5 h-5 text-slate-500" />
-                                Download XML Only
                             </button>
                         </div>
                     </div>

@@ -113,11 +113,11 @@ export default function EncodingFixer() {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
                         <div>
-                            <p className="text-sm text-slate-500 font-medium">Original Encoding Detected</p>
+                            <p className="text-sm text-slate-500 font-medium">កូដដែលបានរកឃើញ (Encoding)</p>
                             <p className="text-lg font-bold text-slate-800">{encoding.toUpperCase()}</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-sm text-slate-500 font-medium">File Name</p>
+                            <p className="text-sm text-slate-500 font-medium">ឈ្មោះហ្វាល់</p>
                             <p className="text-slate-800">{file.name}</p>
                         </div>
                         <button
@@ -128,30 +128,37 @@ export default function EncodingFixer() {
                             }}
                             className="text-sm text-red-500 hover:text-red-600 underline"
                         >
-                            Reset
+                            ចាប់ផ្តើមឡើងវិញ
                         </button>
                     </div>
 
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-800 mb-3">Preview (First 5 Rows)</h3>
+                        <h3 className="text-lg font-semibold text-slate-800 mb-3">មើលគំរូ (៥ ជួរដំបូង)</h3>
                         <div className="overflow-x-auto border border-slate-200 rounded-lg">
                             <table className="w-full text-sm text-left">
                                 <thead className="bg-slate-50 text-slate-700 font-medium">
                                     {(previewRows.length > 0) && (() => {
+                                        // Helper for Khmer numerals
+                                        const toKhmerNumeral = (num: number) => {
+                                            const khmerNums = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+                                            return num.toString().split('').map(d => khmerNums[parseInt(d)]).join('');
+                                        };
+
                                         // Auto-detect structure for headers
-                                        // Heuristic: Check if 2nd column (index 1) is numeric (Points)
-                                        // If yes -> Compact (Type, Points, Question, Correct, Choices...)
-                                        // If no -> Spaced (Type, Empty, Points, Question, Correct, Choices...)
                                         const sampleRow = previewRows[0];
                                         const col1 = sampleRow[1];
-                                        const isCol1Numeric = !isNaN(Number(col1)) && col1 !== undefined && col1 !== '';
 
-                                        const baseHeaders = isCol1Numeric
-                                            ? ['Type', 'Points', 'Question Text', 'Correct Answer']
-                                            : ['Type', 'Empty', 'Points', 'Question Text', 'Correct Answer'];
+                                        // Robust check: Is it numeric OR does it match the "Points" header?
+                                        const isPointsColumn =
+                                            (!isNaN(Number(col1)) && col1 !== undefined && col1 !== '') ||
+                                            ['Points', 'ពិន្ទុ'].includes((col1 || '').toString().trim());
+
+                                        const baseHeaders = isPointsColumn
+                                            ? ['ប្រភេទសំណួរ', 'ពិន្ទុ', 'សំណួរ', 'ចម្លើយ']
+                                            : ['ប្រភេទសំណួរ', 'ពិន្ទុ', 'សំណួរ', 'ចម្លើយ'];
 
                                         const choiceCount = Math.max(0, sampleRow.length - baseHeaders.length);
-                                        const choiceHeaders = Array.from({ length: choiceCount }, (_, i) => `Choice ${i + 1}`);
+                                        const choiceHeaders = Array.from({ length: choiceCount }, (_, i) => `ជម្រើសទី${toKhmerNumeral(i + 1)}`);
 
                                         const allHeaders = [...baseHeaders, ...choiceHeaders];
 
@@ -179,11 +186,11 @@ export default function EncodingFixer() {
                                 </tbody>
                             </table>
                             {previewRows.length === 0 && (
-                                <div className="p-4 text-center text-slate-500">No data found</div>
+                                <div className="p-4 text-center text-slate-500">មិនមានទិន្នន័យ</div>
                             )}
                         </div>
                         <p className="text-xs text-slate-400 mt-2">
-                            * Note: Please check if Khmer characters (e.g., ខ្មែរ) look correct.
+                            * ចំណាំ៖ សូមពិនិត្យមើលថា តួអក្សរខ្មែរ (ឧទាហរណ៍៖ ខ្មែរ) ត្រឹមត្រូវដែរឬទេ។
                         </p>
                     </div>
 
@@ -193,7 +200,7 @@ export default function EncodingFixer() {
                             className="px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2"
                         >
                             <Download className="w-5 h-5" />
-                            Download Fixed UTF-8 CSV
+                            ទាញយកហ្វាល់ CSV ដែលបានជួសជុល
                         </button>
                     </div>
                 </div>

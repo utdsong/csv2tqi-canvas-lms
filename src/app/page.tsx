@@ -1,4 +1,4 @@
-import EncodingFixer from "@/components/EncodingFixer";
+
 import ConverterInterface from "@/components/ConverterInterface";
 import { FileUp, Wand2, PackageCheck, FileDown } from "lucide-react";
 
@@ -13,7 +13,7 @@ export default function Home() {
               <Wand2 className="w-6 h-6 text-primary" />
             </div>
             <h1 className="text-xl font-bold text-slate-800">
-              CSV to QTI Converter <span className="text-slate-400 font-normal">for Canvas LMS</span>
+              XLSX to QTI Converter <span className="text-slate-400 font-normal">for Canvas LMS</span>
             </h1>
           </div>
           <div className="text-sm text-slate-500">
@@ -31,13 +31,13 @@ export default function Home() {
               ដំណោះស្រាយក្នុងការផ្ទេរលំហាត់ដោយស្វ័យកម្ម
             </h2>
             <p className="text-lg text-slate-600">
-              បំប្លែងហ្វាល់ CSV ទៅជាហ្វាល់ TQI សម្រាប់បញ្ចូលសំណួរទៅក្នុងប្រព័ន្ធគ្រប់គ្រងការសិក្សា
+              បំប្លែងហ្វាល់ Excel .xlsx ទៅជាហ្វាល់ TQI សម្រាប់បញ្ចូលសំណួរទៅក្នុងប្រព័ន្ធគ្រប់គ្រងការសិក្សា
             </p>
           </div>
 
           <a
-            href="/Template.csv"
-            download="Quiz_Template.csv"
+            href="/Template.xlsx"
+            download="Quiz_Template.xlsx"
             className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 shadow-sm rounded-lg text-slate-700 font-medium hover:bg-slate-50 hover:text-primary hover:border-primary/20 transition-all"
           >
             <FileDown className="w-5 h-5" />
@@ -45,28 +45,8 @@ export default function Home() {
           </a>
         </div>
 
-        {/* Feature 1: Encoding Fixer */}
-        <section id="encoding-fixer" className="space-y-4">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-bold text-sm">1</span>
-            <h3 className="text-xl font-semibold text-slate-800">
-              ឧបករណ៏កែប្រែហ្វាល់ CSV ដែលអានខ្មែរមិនដាច់
-            </h3>
-          </div>
-          <EncodingFixer />
-        </section>
-
-        {/* Divider */}
-        <div className="border-t border-slate-200 my-12" />
-
-        {/* Feature 2 & 3: QTI Converter */}
+        {/* QTI Converter */}
         <section id="qti-converter" className="space-y-4">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-bold text-sm">2</span>
-            <h3 className="text-xl font-semibold text-slate-800">
-              QTI 1.2 Converter
-            </h3>
-          </div>
           <ConverterInterface />
         </section>
 

@@ -85,9 +85,23 @@ export async function parseQuestionsFromFile(file: File): Promise<Question[]> {
           // Headerless / Custom Format (User's Sample)
           console.log("Detected headerless/custom format");
           // Use raw: true to prevent "1,2,4" -> 37988.xxxx
-          const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, raw: true });
+          let rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, raw: true });
 
-          questions = rows.filter(r => r.length > 0).map((row, idx) => {
+          // Filter out empty rows first
+          rows = rows.filter(r => r.length > 0);
+
+          // Check for Header Row
+          // If the first cell of the first row is NOT a valid question type, we assume it's a header.
+          if (rows.length > 0) {
+            const firstCell = (rows[0][0] || '').toString().toUpperCase().trim();
+            const validTypes = ['MC', 'TF', 'MR'];
+            if (!validTypes.includes(firstCell)) {
+              console.log("Skipping header row:", rows[0]);
+              rows.shift(); // Remove the header row
+            }
+          }
+
+          questions = rows.map((row, idx) => {
             // Auto-Detect Structure:
             // Case 1 (User's latest screenshot): [Type, Points, Question, Correct, Choices...]
             // Case 2 (Previous file): [Type, Empty, Points, Question, Correct, Choices...]
