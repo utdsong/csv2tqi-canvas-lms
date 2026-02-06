@@ -28,7 +28,7 @@ export default function Home() {
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-6">
           <div className="space-y-4">
             <h2 className="text-3xl font-bold text-slate-900">
-              ដំណោះស្រាយក្នុងការផ្ទេរលំហាត់ដោយស្វ័យកម្ម
+              ដំណោះស្រាយក្នុងការផ្ទេរលំហាត់ដោយស្វ័យប្រវត្តិកម្ម
             </h2>
             <p className="text-lg text-slate-600">
               បំប្លែងហ្វាល់ Excel .xlsx ទៅជាហ្វាល់ TQI សម្រាប់បញ្ចូលសំណួរទៅក្នុងប្រព័ន្ធគ្រប់គ្រងការសិក្សា

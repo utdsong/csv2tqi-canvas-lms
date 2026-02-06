@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FileUp, PackageCheck, AlertCircle, Loader2, Download, FileSpreadsheet, FileCode } from 'lucide-react';
 import { parseQuestionsFromFile, generateQTIXML, Question } from '@/utils/qti-generator';
 import { createCanvasPackage } from '@/utils/packaging';
@@ -11,6 +11,15 @@ export default function ConverterInterface() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
     const [generating, setGenerating] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return null;
+    }
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
